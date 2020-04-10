@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -78,6 +79,10 @@ func runWithAwsEnv(includeFullEnv bool, name string, arg ...string) error {
 	return runWithEnv(name, env, arg...)
 }
 
+/**
+ * This method will only return if there is an erorr running the subcommand.
+ * Otherwise it will Exit with the appropriate exit code.
+ */
 func runWithEnv(name string, env []string, arg ...string) error {
 	binary, err := exec.LookPath(name)
 	if err != nil {
@@ -91,6 +96,21 @@ func runWithEnv(name string, env []string, arg ...string) error {
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
-	err = cmd.Run()
+	// This is subtly different from simply `cmd.Run()`, though I don't understand why.
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+	err = cmd.Wait()
+
+	if err == nil {
+		os.Exit(0)
+	}
+
+	var exit *exec.ExitError
+	if errors.As(err, &exit) {
+		os.Exit(exit.ProcessState.ExitCode())
+	}
+
 	return err
 }
