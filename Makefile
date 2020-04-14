@@ -4,23 +4,27 @@ GOINSTALL=$(GOCMD) install
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
+GOMOD=$(GOCMD) mod
 BINARY_NAME=aws-keycloak
-DEP=dep
 
 .PHONY: all
-all: dep test build
+all: test build
 
-.PHONY: dep
-dep:
-	$(DEP) ensure
+.PHONY: test
+test:
+	$(GOTEST) -v ./...
 
 .PHONY: build
 build:
 	$(GOBUILD) -o $(BINARY_NAME) -v
 
-.PHONY: test
-test:
-	$(GOTEST) -v ./...
+.PHONY: vendor
+vendor:
+	$(GOMOD) vendor
+
+.PHONY: tidy
+tidy:
+	$(GOMOD) tidy
 
 .PHONY: clean
 clean:
