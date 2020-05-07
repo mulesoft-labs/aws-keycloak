@@ -104,7 +104,7 @@ func runWithEnv(name string, env []string, arg ...string) error {
 	err = cmd.Wait()
 
 	if err == nil {
-		os.Exit(0)
+		return err
 	}
 
 	var exit *exec.ExitError
