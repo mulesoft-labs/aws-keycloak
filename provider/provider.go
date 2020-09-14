@@ -19,8 +19,9 @@ var (
 )
 
 type Provider struct {
-	K KeycloakProviderIf
-	A AwsProviderIf
+	K          KeycloakProviderIf
+	A          AwsProviderIf
+	AlwaysAuth bool
 }
 
 func (p *Provider) List() (roles []string, err error) {
@@ -45,15 +46,19 @@ func (p *Provider) List() (roles []string, err error) {
 }
 
 func (p *Provider) Retrieve(awsrole string) (sts.Credentials, string, error) {
-	log.Debugf("Step 0: Checking existing AWS session for %s", awsrole)
-	creds, err := p.A.CheckAlreadyAuthd(awsrole)
-	if err == nil {
-		log.Debugf("AWS session already valid for %s", awsrole)
-		return creds, awsrole, nil
+	if p.AlwaysAuth {
+		log.Debugf("Step 0: Skipping check for existing AWS session for %s", awsrole)
+	} else {
+		log.Debugf("Step 0: Checking existing AWS session for %s", awsrole)
+		creds, err := p.A.CheckAlreadyAuthd(awsrole)
+		if err == nil {
+			log.Debugf("AWS session already valid for %s", awsrole)
+			return creds, awsrole, nil
+		}
 	}
 
 	log.Debug("Step 1: Auth to Keycloak")
-	err = p.K.BrowserAuth()
+	err := p.K.BrowserAuth()
 	/** Basic auth is deprecated
 	newCreds := p.K.RetrieveKeycloakCreds()
 	err = p.K.BasicAuth()
@@ -78,7 +83,7 @@ func (p *Provider) Retrieve(awsrole string) (sts.Credentials, string, error) {
 	if awsrole == "" {
 		log.Infof("Assuming role '%s'. You can specify this with the --profile flag", awsshortrole)
 	}
-	creds, err = p.A.AssumeRoleWithSAML(rps[n], string(assertion.RawResp))
+	creds, err := p.A.AssumeRoleWithSAML(rps[n], string(assertion.RawResp))
 	if err != nil {
 		if err.(awserr.Error).Code() == sts.ErrCodeExpiredTokenException {
 			log.Errorf("You took too long to pick a role")

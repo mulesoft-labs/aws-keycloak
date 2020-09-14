@@ -13,10 +13,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	awsDuration = 3600
-)
-
 type AwsProviderIf interface {
 	AssumeRoleWithSAML(saml.RolePrincipal, string) (sts.Credentials, error)
 	CheckAlreadyAuthd(string) (sts.Credentials, error)
@@ -24,8 +20,9 @@ type AwsProviderIf interface {
 }
 
 type AwsProvider struct {
-	Keyring keyring.Keyring
-	Region  string
+	Keyring  keyring.Keyring
+	Region   string
+	Duration int64 // this sets the maximum request, not necessarily what will be granted
 }
 
 func (a *AwsProvider) AssumeRoleWithSAML(rp saml.RolePrincipal, assertion string) (sts.Credentials, error) {
@@ -38,7 +35,7 @@ func (a *AwsProvider) AssumeRoleWithSAML(rp saml.RolePrincipal, assertion string
 		PrincipalArn:    aws.String(rp.Principal),
 		RoleArn:         aws.String(rp.Role),
 		SAMLAssertion:   aws.String(assertion),
-		DurationSeconds: aws.Int64(awsDuration),
+		DurationSeconds: aws.Int64(a.Duration),
 	}
 
 	samlResp, err := svc.AssumeRoleWithSAML(samlParams)
