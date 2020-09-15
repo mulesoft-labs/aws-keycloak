@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/99designs/keyring"
 	log "github.com/sirupsen/logrus"
@@ -131,6 +132,10 @@ func prerun(cmd *cobra.Command, args []string) error {
 	// So hacky!
 	if cmd == openCmd && len(args) == 1 {
 		awsrole = args[0]
+	}
+
+	if !regexp.MustCompile("^[a-z-]+$").MatchString(awsrole) {
+		return fmt.Errorf("'%s' is not a valid role to request. Try `power-devx`.", awsrole)
 	}
 
 	aliases := provider.Aliases(sections["aliases"])

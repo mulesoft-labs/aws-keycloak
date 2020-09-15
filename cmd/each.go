@@ -19,7 +19,7 @@ var eachCmd = &cobra.Command{
 }
 
 func init() {
-	eachCmd.PersistentFlags().StringVarP(&eachFilter, "filter", "f", "", "Regex to filter listed roles (eg. 'admin')")
+	eachCmd.PersistentFlags().StringVarP(&eachFilter, "filter", "f", "", "Regex to filter listed roles (eg. 'admin').")
 	RootCmd.AddCommand(eachCmd)
 }
 
@@ -40,7 +40,7 @@ func runEach(cmd *cobra.Command, args []string) error {
 			continue
 		}
 		p := re.FindStringSubmatch(role)
-		log.Infof("%s\n", p[1])
+		log.Infof("role %s\n", p[1])
 		awsrole = p[1]
 		err = runWithAwsEnv(true, args[0], args[1:]...)
 		if err != nil {

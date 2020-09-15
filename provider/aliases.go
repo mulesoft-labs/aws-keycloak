@@ -27,7 +27,7 @@ func (as Aliases) Lookup(alias string) (kcprofile, awsrole, region string, durat
 	}
 	// else region is empty
 	if len(s) >= 4 {
-		duration, _ = strconv.ParseUint(s[2], 10, 64)
+		duration, _ = strconv.ParseUint(s[3], 10, 64)
 	}
 	return
 }
