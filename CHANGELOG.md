@@ -1,3 +1,22 @@
+### 1.7.0
+* Add `--always-auth` `-a` flag to not check keyring for cached creds (but still try to store them)
+* Add `--session-duration` `-t` flag to request a different token lifetime, up to 12 hours (may not be granted)
+* Add support for session duration in aliases
+* Add `max-duration` subcommand to return the maximum possible session duration request for a profile
+* `each` subcommand no longer prints each role to stdout as it iterates
+
+### 1.6.1
+* Bugfix for `each` subcommand with exit codes
+
+### 1.6.0
+* [internal] migration to go modules
+
+### 1.5.0
+* Better handling of pipes (in and out) and exit codes
+
+### 1.4.3
+* Allow `--region` `-r` to be used at top level
+
 ### 1.4.2
 * Update the aws-sdk-go, gomock, and logrus versions.
 
