@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/99designs/keyring"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ var (
 
 const (
 	KeycloakConfigUrl = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
-	KeycloakVersion   = "1.6.1"
+	KeycloakVersion   = "1.7.0"
 )
 
 // global flags
@@ -32,6 +33,8 @@ var (
 	kr         keyring.Keyring
 	debug      bool
 	quiet      bool
+	alwaysAuth bool
+	duration   uint64
 	configFile string
 	kcprofile  string
 	awsrole    string
@@ -131,11 +134,15 @@ func prerun(cmd *cobra.Command, args []string) error {
 		awsrole = args[0]
 	}
 
+	if !regexp.MustCompile("^[a-z-]+$").MatchString(awsrole) {
+		return fmt.Errorf("'%s' is not a valid role to request. Try `power-devx`.", awsrole)
+	}
+
 	aliases := provider.Aliases(sections["aliases"])
 	if aliases.Exists(awsrole) {
 		alias := awsrole
-		kcprofile, awsrole, region = aliases.Lookup(alias)
-		log.Debugf("Found alias for %s: %s %s %s", alias, kcprofile, awsrole, region)
+		kcprofile, awsrole, region, duration = aliases.Lookup(alias)
+		log.Debugf("Found alias for %s: %s %s %s %d", alias, kcprofile, awsrole, region, duration)
 	}
 	if regionFlag != "" {
 		region = regionFlag
@@ -154,13 +161,15 @@ func init() {
 	for _, backendType := range keyring.AvailableBackends() {
 		backendsAvailable = append(backendsAvailable, string(backendType))
 	}
-	RootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", provider.DefaultConf, "Keycloak provider configuration")
-	RootCmd.PersistentFlags().StringVarP(&backend, "backend", "b", "", fmt.Sprintf("Secret backend to use %s", backendsAvailable))
-	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug output")
-	RootCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Minimize output")
-	RootCmd.PersistentFlags().StringVarP(&kcprofile, "keycloak-profile", "k", provider.DefaultKeycloak, "Keycloak system to auth to")
-	RootCmd.PersistentFlags().StringVarP(&awsrole, "profile", "p", "", "AWS profile to run against (recommended)")
-	RootCmd.PersistentFlags().StringVarP(&regionFlag, "region", "r", "", "AWS region to use (overrides alias settings)")
+	RootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", provider.DefaultConf, "Keycloak provider configuration.")
+	RootCmd.PersistentFlags().StringVarP(&backend, "backend", "b", "", fmt.Sprintf("Secret backend to use %s.", backendsAvailable))
+	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug output.")
+	RootCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Minimize output.")
+	RootCmd.PersistentFlags().StringVarP(&kcprofile, "keycloak-profile", "k", provider.DefaultKeycloak, "Keycloak system to auth to.")
+	RootCmd.PersistentFlags().StringVarP(&awsrole, "profile", "p", "", "AWS profile to run against (recommended).")
+	RootCmd.PersistentFlags().StringVarP(&regionFlag, "region", "r", "", fmt.Sprintf("AWS region to use (overrides alias settings). Default %s", provider.DefaultRegion))
+	RootCmd.PersistentFlags().BoolVarP(&alwaysAuth, "always-auth", "a", false, "Do no use cached token, always force new SAML authentication.")
+	RootCmd.PersistentFlags().Uint64VarP(&duration, "session-duration", "t", provider.DefaultSAMLSessionDuration, "Requested session duration in seconds. Max is 12 hours (43200).")
 }
 
 func fetchConfig() {

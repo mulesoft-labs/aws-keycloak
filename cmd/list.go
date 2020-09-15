@@ -19,7 +19,7 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.PersistentFlags().StringVarP(&listFilter, "filter", "f", "", "Regex to filter listed roles (eg. 'admin')")
+	listCmd.PersistentFlags().StringVarP(&listFilter, "filter", "f", "", "Regex to filter listed roles (eg. 'admin').")
 	RootCmd.AddCommand(listCmd)
 }
 

@@ -26,12 +26,14 @@ func makeProvider() (*provider.Provider, error) {
 		}
 	}
 	a := &provider.AwsProvider{
-		Keyring: kr,
-		Region:  region,
+		Keyring:  kr,
+		Region:   region,
+		Duration: int64(duration),
 	}
 	return &provider.Provider{
-		A: a,
-		K: k,
+		A:          a,
+		K:          k,
+		AlwaysAuth: alwaysAuth,
 	}, nil
 }
 
