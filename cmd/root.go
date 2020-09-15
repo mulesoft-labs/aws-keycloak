@@ -22,9 +22,8 @@ var (
 )
 
 const (
-	KeycloakConfigUrl          = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
-	KeycloakVersion            = "1.7.0"
-	DefaultSAMLSessionDuration = 3600
+	KeycloakConfigUrl = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
+	KeycloakVersion   = "1.7.0"
 )
 
 // global flags
@@ -34,7 +33,7 @@ var (
 	debug      bool
 	quiet      bool
 	alwaysAuth bool
-	duration   uint
+	duration   uint64
 	configFile string
 	kcprofile  string
 	awsrole    string
@@ -137,8 +136,8 @@ func prerun(cmd *cobra.Command, args []string) error {
 	aliases := provider.Aliases(sections["aliases"])
 	if aliases.Exists(awsrole) {
 		alias := awsrole
-		kcprofile, awsrole, region = aliases.Lookup(alias)
-		log.Debugf("Found alias for %s: %s %s %s", alias, kcprofile, awsrole, region)
+		kcprofile, awsrole, region, duration = aliases.Lookup(alias)
+		log.Debugf("Found alias for %s: %s %s %s %d", alias, kcprofile, awsrole, region, duration)
 	}
 	if regionFlag != "" {
 		region = regionFlag
@@ -165,7 +164,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&awsrole, "profile", "p", "", "AWS profile to run against (recommended).")
 	RootCmd.PersistentFlags().StringVarP(&regionFlag, "region", "r", "", "AWS region to use (overrides alias settings).")
 	RootCmd.PersistentFlags().BoolVarP(&alwaysAuth, "always-auth", "a", false, "Do no use cached token, always force new SAML authentication.")
-	RootCmd.PersistentFlags().UintVarP(&duration, "session-duration", "t", DefaultSAMLSessionDuration, "Requested session duration in seconds. Max is 12 hours (43200).")
+	RootCmd.PersistentFlags().Uint64VarP(&duration, "session-duration", "t", provider.DefaultSAMLSessionDuration, "Requested session duration in seconds. Max is 12 hours (43200).")
 }
 
 func fetchConfig() {

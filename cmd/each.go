@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -40,7 +40,7 @@ func runEach(cmd *cobra.Command, args []string) error {
 			continue
 		}
 		p := re.FindStringSubmatch(role)
-		fmt.Printf("%s\n", p[1])
+		log.Infof("%s\n", p[1])
 		awsrole = p[1]
 		err = runWithAwsEnv(true, args[0], args[1:]...)
 		if err != nil {
