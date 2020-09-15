@@ -167,7 +167,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Minimize output.")
 	RootCmd.PersistentFlags().StringVarP(&kcprofile, "keycloak-profile", "k", provider.DefaultKeycloak, "Keycloak system to auth to.")
 	RootCmd.PersistentFlags().StringVarP(&awsrole, "profile", "p", "", "AWS profile to run against (recommended).")
-	RootCmd.PersistentFlags().StringVarP(&regionFlag, "region", "r", "", "AWS region to use (overrides alias settings).")
+	RootCmd.PersistentFlags().StringVarP(&regionFlag, "region", "r", "", fmt.Sprintf("AWS region to use (overrides alias settings). Default %s", provider.DefaultRegion))
 	RootCmd.PersistentFlags().BoolVarP(&alwaysAuth, "always-auth", "a", false, "Do no use cached token, always force new SAML authentication.")
 	RootCmd.PersistentFlags().Uint64VarP(&duration, "session-duration", "t", provider.DefaultSAMLSessionDuration, "Requested session duration in seconds. Max is 12 hours (43200).")
 }
