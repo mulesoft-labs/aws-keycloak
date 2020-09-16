@@ -29,29 +29,12 @@ func unixToAbsoluteTime(s int64, ns int64) C.CFAbsoluteTime {
 	// isn't much earlier than the Core Foundation absolute
 	// reference date).
 	abs := s - absoluteTimeIntervalSince1970()
-	// Need to cast CFTimeInterval to CFAbsoluteTime for go 1.9.x.
-	return C.CFAbsoluteTime(abs) + C.CFAbsoluteTime(C.CFTimeInterval(ns))/nsPerSec
+	return C.CFAbsoluteTime(abs) + C.CFTimeInterval(ns)/nsPerSec
 }
 
 func absoluteTimeToUnix(abs C.CFAbsoluteTime) (int64, int64) {
 	int, frac := math.Modf(float64(abs))
 	return int64(int) + absoluteTimeIntervalSince1970(), int64(frac * nsPerSec)
-}
-
-func absoluteTimeToDebugString(abs C.CFAbsoluteTime) string {
-	dateFormatter := C.CFDateFormatterCreate(C.kCFAllocatorDefault, C.CFLocaleCopyCurrent(), C.kCFDateFormatterFullStyle, C.kCFDateFormatterFullStyle)
-	defer Release(C.CFTypeRef(dateFormatter))
-	cfStr := C.CFDateFormatterCreateStringWithAbsoluteTime(C.kCFAllocatorDefault, dateFormatter, abs)
-	defer Release(C.CFTypeRef(cfStr))
-	return CFStringToString(cfStr)
-}
-
-func cfDateToDebugString(d C.CFDateRef) string {
-	dateFormatter := C.CFDateFormatterCreate(C.kCFAllocatorDefault, C.CFLocaleCopyCurrent(), C.kCFDateFormatterFullStyle, C.kCFDateFormatterFullStyle)
-	defer Release(C.CFTypeRef(dateFormatter))
-	cfStr := C.CFDateFormatterCreateStringWithDate(C.kCFAllocatorDefault, dateFormatter, d)
-	defer Release(C.CFTypeRef(cfStr))
-	return CFStringToString(cfStr)
 }
 
 // TimeToCFDate will convert the given time.Time to a CFDateRef, which
