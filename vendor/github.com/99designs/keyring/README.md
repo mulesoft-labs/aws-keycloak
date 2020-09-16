@@ -1,6 +1,6 @@
 Keyring
 =======
-[![Build Status](https://travis-ci.org/99designs/keyring.svg?branch=master)](https://travis-ci.org/99designs/keyring)
+[![Build Status](https://github.com/99designs/keyring/workflows/Continuous%20Integration/badge.svg)](https://github.com/99designs/keyring/actions)
 [![Documentation](https://godoc.org/github.com/99designs/keyring?status.svg)](https://godoc.org/github.com/99designs/keyring)
 
 Keyring provides utility functions for and a common interface to a range of secure credential storage services. Originally developed as part of [AWS Vault](https://github.com/99designs/aws-vault), a command line tool for securely managing AWS access from developer workstations.
@@ -8,6 +8,7 @@ Keyring provides utility functions for and a common interface to a range of secu
 Currently Keyring supports the following backends
   * macOS/OSX Keychain
   * Windows credential store
+  * [Pass](https://www.passwordstore.org/)
   * [Secret Service](https://github.com/99designs/aws-vault/pull/98)
   * [KDE Wallet](https://github.com/99designs/aws-vault/pull/27)
   * [Encrypted File](https://github.com/99designs/aws-vault/pull/63)
