@@ -1,3 +1,6 @@
+### 1.7.1
+* Bugfix for subcommands that don't take an awsrole profile argument (list, each)
+
 ### 1.7.0
 * Add `--always-auth` `-a` flag to not check keyring for cached creds (but still try to store them)
 * Add `--session-duration` `-t` flag to request a different token lifetime, up to 12 hours (may not be granted)
