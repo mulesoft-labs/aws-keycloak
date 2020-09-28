@@ -1,3 +1,6 @@
+### 1.7.2
+* Bugfix for profiles that contain numbers
+
 ### 1.7.1
 * Bugfix for subcommands that don't take an awsrole profile argument (list, each)
 

@@ -24,7 +24,7 @@ var (
 
 const (
 	KeycloakConfigUrl = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
-	KeycloakVersion   = "1.7.1"
+	KeycloakVersion   = "1.7.2"
 )
 
 // global flags
@@ -134,7 +134,7 @@ func prerun(cmd *cobra.Command, args []string) error {
 		awsrole = args[0]
 	}
 
-	if len(awsrole) > 0 && !regexp.MustCompile("^[a-z-]+$").MatchString(awsrole) {
+	if !ValidateProfile(awsrole) {
 		return fmt.Errorf("'%s' is not a valid role to request. Try `power-devx`.", awsrole)
 	}
 
@@ -154,6 +154,13 @@ func prerun(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func ValidateProfile(p string) bool {
+	if len(p) > 0 && !regexp.MustCompile("^[a-zA-Z0-9_-]+$").MatchString(p) {
+		return false
+	}
+	return true
 }
 
 func init() {
