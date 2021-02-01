@@ -1,3 +1,7 @@
+### 1.7.3
+* Add flag `--print-env` flag to `each` subcommand to improve readability
+* Some better error handling when wrong number of args are passed
+
 ### 1.7.2
 * Bugfix for profiles that contain numbers
 
