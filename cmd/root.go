@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -14,17 +13,9 @@ import (
 	"github.com/mulesoft-labs/aws-keycloak/provider"
 )
 
-// Errors returned from frontend commands
-var (
-	ErrCommandMissing         = errors.New("must specify command to run")
-	ErrTooManyArguments       = errors.New("too many arguments")
-	ErrTooFewArguments        = errors.New("too few arguments")
-	ErrFailedToSetCredentials = errors.New("Failed to set credentials in your keyring")
-)
-
 const (
 	KeycloakConfigUrl = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
-	KeycloakVersion   = "1.7.2"
+	KeycloakVersion   = "1.7.3"
 )
 
 // global flags
@@ -48,17 +39,15 @@ var RootCmd = &cobra.Command{
 	Use:               "aws-keycloak [flags] -- <command>",
 	Short:             "aws-keycloak allows you to authenticate with AWS using your keycloak credentials",
 	Example:           "  aws-keycloak -p power-devx -- aws sts get-caller-identity",
-	SilenceUsage:      true,
-	SilenceErrors:     true,
+	SilenceUsage:      false,
+	SilenceErrors:     false,
 	PersistentPreRunE: prerun,
+	Args:              cobra.MinimumNArgs(1),
 	RunE:              runCommand,
 	Version:           KeycloakVersion,
 }
 
 func runCommand(cmd *cobra.Command, args []string) error {
-	if len(args) == 0 {
-		return ErrTooFewArguments
-	}
 	return runWithAwsEnv(true, args[0], args[1:]...)
 }
 
@@ -66,11 +55,7 @@ func runCommand(cmd *cobra.Command, args []string) error {
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		switch err {
-		case ErrTooFewArguments, ErrTooManyArguments:
-			RootCmd.Usage()
-		}
+		// Error will be printed (at least once) automatically
 		os.Exit(1)
 	}
 }

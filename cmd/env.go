@@ -8,6 +8,7 @@ var envCmd = &cobra.Command{
 	Use:     "env",
 	Short:   "Invokes `printenv`. Takes var names or prints AWS env.",
 	Example: "  aws-keycloak -p power-devx env\n  export AWS_ACCESS_KEY_ID=$(aws-keycloak -p power-devx env AWS_ACCESS_KEY_ID)\n  export `aws-keycloak -p power-devx env`",
+	Args:    cobra.MaximumNArgs(1),
 	RunE:    runEnvCmd,
 }
 

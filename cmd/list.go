@@ -15,6 +15,7 @@ var listCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "List aws profiles available",
 	Example: " aws-keycloak list",
+	Args:    cobra.MaximumNArgs(0),
 	RunE:    runList,
 }
 
@@ -24,10 +25,6 @@ func init() {
 }
 
 func runList(cmd *cobra.Command, args []string) error {
-	if len(args) > 0 {
-		return ErrTooManyArguments
-	}
-
 	filter, err := regexp.Compile(listFilter)
 	if err != nil {
 		return err

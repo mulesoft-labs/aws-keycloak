@@ -22,6 +22,7 @@ var openCmd = &cobra.Command{
 	Aliases: []string{"login"},
 	Short:   "Open a AWS console logged into a given profile",
 	Example: "  aws-keycloak open power-devx",
+	Args:    cobra.MaximumNArgs(1),
 	RunE:    runOpenCmd,
 }
 
@@ -30,10 +31,6 @@ func init() {
 }
 
 func runOpenCmd(cmd *cobra.Command, args []string) error {
-	if len(args) > 1 {
-		return ErrTooManyArguments
-	}
-
 	stscreds, err := getAwsStsCreds()
 	if err != nil {
 		return err
