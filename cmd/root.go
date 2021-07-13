@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	KeycloakConfigUrl = "https://wiki.corp.mulesoft.com/download/attachments/53909517/keycloak-config?api=v2"
-	KeycloakVersion   = "1.7.3"
+	KeycloakConfigUrl = "https://confluence.internal.salesforce.com/download/attachments/335339888/keycloak-config?api=v2"
+	KeycloakVersion   = "1.7.4"
 )
 
 // global flags

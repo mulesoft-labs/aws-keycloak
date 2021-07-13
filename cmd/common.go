@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/service/sts"
@@ -98,21 +99,30 @@ func runWithEnv(name string, env []string, arg ...string) error {
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
+	// capture all signals
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan)
+
+	go func() {
+		// forward any signals onto the child process
+		for {
+			sig := <-sigChan
+			log.Debugf("Sending signal to child process `%s`", sig.String())
+			_ = cmd.Process.Signal(sig)
+		}
+	}()
+
 	// This is subtly different from simply `cmd.Run()`, though I don't understand why.
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-	err = cmd.Wait()
-
-	if err == nil {
+	if err = cmd.Start(); err != nil {
 		return err
 	}
 
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		os.Exit(exit.ProcessState.ExitCode())
+	if err = cmd.Wait(); err != nil {
+		_ = cmd.Process.Signal(os.Kill)
+		var exit *exec.ExitError
+		if errors.As(err, &exit) {
+			os.Exit(exit.ProcessState.ExitCode())
+		}
 	}
-
-	return err
+	return err //which must be nil
 }
