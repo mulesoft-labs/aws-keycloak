@@ -1,3 +1,7 @@
+### 1.7.4
+* Forward signals to child process without killing parent
+* Upgrade spf13/cobra to 1.2.1
+
 ### 1.7.3
 * Add flag `--print-env` flag to `each` subcommand to improve readability
 * Some better error handling when wrong number of args are passed
